@@ -5,43 +5,27 @@ on:
     branches: [main]
 
 jobs:
-  test-allow:
-    name: "Test: staging deploy (should ALLOW)"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: SidClaw Governance Check - Staging
-        id: governance
-        uses: sidclawhq/governance-action@v1
-        with:
-          api-key: ${{ secrets.SIDCLAW_API_KEY }}
-          agent-id: 'a4d64f5c-897f-4da6-a7a8-b4831d2cea66'
-          operation: 'deploy'
-          target-integration: 'staging'
-          data-classification: 'internal'
-          wait-for-approval: 'false'
-      - name: Check decision
-        run: |
-          echo "Decision: ${{ steps.governance.outputs.decision }}"
-          echo "Trace ID: ${{ steps.governance.outputs.trace-id }}"
-
-  test-deny:
-    name: "Test: production deploy (should DENY - no policy)"
+  test-approval-required:
+    name: "Test: production deploy (should require APPROVAL)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: SidClaw Governance Check - Production
         id: governance
         uses: sidclawhq/governance-action@v1
-        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           api-key: ${{ secrets.SIDCLAW_API_KEY }}
-          agent-id: 'a4d64f5c-897f-4da6-a7a8-b4831d2cea66'
+          agent-id: '9911d784-17ce-4466-9504-400dc1e2df78'
           operation: 'deploy'
           target-integration: 'production'
           data-classification: 'confidential'
           wait-for-approval: 'false'
-      - name: Verify denied
+          timeout: '30'
+      - name: Check outputs
+        if: always()
         run: |
           echo "Decision: ${{ steps.governance.outputs.decision }}"
-          echo "Expected: deny (no matching policy = deny-by-default)"
+          echo "Trace ID: ${{ steps.governance.outputs.trace-id }}"
+          echo "Approval ID: ${{ steps.governance.outputs.approval-id }}"
