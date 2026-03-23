@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
 
+permissions:
+  checks: write
+  contents: read
+
 jobs:
   test-approval-required:
     name: "Test: production deploy (should require APPROVAL)"
