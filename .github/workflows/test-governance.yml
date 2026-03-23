@@ -1,0 +1,22 @@
+name: Test Governance Check
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  governance-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SidClaw Governance Check
+        uses: sidclawhq/governance-action@v1
+        with:
+          api-key: ${{ secrets.SIDCLAW_API_KEY }}
+          agent-id: 'ci-test-agent'
+          operation: 'deploy'
+          target-integration: 'production'
+          data-classification: 'internal'
+          wait-for-approval: 'false'
+          timeout: '30'
