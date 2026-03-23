@@ -1,0 +1,3 @@
+node_modules/
+package-lock.json
+# dist/ is intentionally committed — GitHub Actions runs from it directly
